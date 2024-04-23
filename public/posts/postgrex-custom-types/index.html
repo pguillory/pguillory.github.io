@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    
+    <title>Postgrex Custom Types | Preston&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <meta name="description" content="Making UUIDs easier to work with in Postgrex using custom types I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
+Postgrex returns UUID values as a 16-byte binary.
+iex&gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&gt; Postgrex.">
+    <meta name="generator" content="Hugo 0.125.3">
+    
+    
+    
+    
+      <meta name="robots" content="noindex, nofollow">
+    
+    
+
+    
+<link rel="stylesheet" href="/ananke/css/main.min.css" >
+
+
+
+    
+
+    
+      
+
+    
+
+    
+
+    
+      <link rel="canonical" href="http://localhost:1313/posts/postgrex-custom-types/">
+    
+
+    <meta property="og:url" content="http://localhost:1313/posts/postgrex-custom-types/">
+  <meta property="og:site_name" content="Preston&#39;s Blog">
+  <meta property="og:title" content="Postgrex Custom Types">
+  <meta property="og:description" content="Making UUIDs easier to work with in Postgrex using custom types I&amp;rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&amp;rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
+Postgrex returns UUID values as a 16-byte binary.
+iex&amp;gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&amp;gt; Postgrex.">
+  <meta property="og:locale" content="en-us">
+  <meta property="og:type" content="article">
+  <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2024-04-23T13:31:40-07:00">
+    <meta property="article:modified_time" content="2024-04-23T13:31:40-07:00">
+
+  <meta itemprop="name" content="Postgrex Custom Types">
+  <meta itemprop="description" content="Making UUIDs easier to work with in Postgrex using custom types I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
+Postgrex returns UUID values as a 16-byte binary.
+iex&gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&gt; Postgrex.">
+  <meta itemprop="datePublished" content="2024-04-23T13:31:40-07:00">
+  <meta itemprop="dateModified" content="2024-04-23T13:31:40-07:00">
+  <meta itemprop="wordCount" content="278"><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Postgrex Custom Types">
+<meta name="twitter:description" content="Making UUIDs easier to work with in Postgrex using custom types I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
+Postgrex returns UUID values as a 16-byte binary.
+iex&gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&gt; Postgrex.">
+
+	
+  </head>
+
+  <body class="ma0 avenir bg-near-white">
+
+    
+   
+  
+
+  <header>
+    <div class="bg-black">
+      <nav class="pv3 ph3 ph4-ns" role="navigation">
+  <div class="flex-l justify-between items-center center">
+    <a href="/" class="f3 fw2 hover-white no-underline white-90 dib">
+      
+        Preston&#39;s Blog
+      
+    </a>
+    <div class="flex-l items-center">
+      
+
+      
+      
+<div class="ananke-socials">
+  
+</div>
+
+    </div>
+  </div>
+</nav>
+
+    </div>
+  </header>
+
+
+
+    <main class="pb7" role="main">
+      
+  
+  <article class="flex-l flex-wrap justify-between mw8 center ph3">
+    <header class="mt4 w-100">
+      <aside class="instapaper_ignoref b helvetica tracked ttu">
+          
+        Posts
+      </aside>
+      
+
+
+
+
+
+
+
+
+
+
+  <div id="sharing" class="mt3 ananke-socials">
+    
+  </div>
+
+
+      <h1 class="f1 athelas mt3 mb1">Postgrex Custom Types</h1>
+      
+      
+      
+      <time class="f6 mv4 dib tracked" datetime="2024-04-23T13:31:40-07:00">April 23, 2024</time>
+      
+
+      
+      
+    </header>
+    <div class="nested-copy-line-height lh-copy serif f4 nested-links mid-gray pr4-l w-two-thirds-l"><h2 id="making-uuids-easier-to-work-with-in-postgrex-using-custom-types">Making UUIDs easier to work with in Postgrex using custom types</h2>
+<p>I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the
+Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto
+(which uses Postgrex under the hood), but I wanted to skip that layer of
+abstraction and write raw SQL.</p>
+<p>Postgrex returns UUID values as a 16-byte binary.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>iex<span style="color:#f92672">&gt;</span> {<span style="color:#e6db74">:ok</span>, conn} <span style="color:#f92672">=</span> <span style="color:#a6e22e">Postgrex</span><span style="color:#f92672">.</span>start_link(<span style="color:#e6db74">hostname</span>: hostname, <span style="color:#e6db74">username</span>: username, <span style="color:#e6db74">password</span>: password, <span style="color:#e6db74">database</span>: database)
+</span></span><span style="display:flex;"><span>iex<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">Postgrex</span><span style="color:#f92672">.</span>query!(conn, <span style="color:#e6db74">&#34;SELECT gen_random_uuid()&#34;</span>, [])<span style="color:#f92672">.</span>rows
+</span></span><span style="display:flex;"><span>[[&lt;&lt;<span style="color:#ae81ff">83</span>, <span style="color:#ae81ff">100</span>, <span style="color:#ae81ff">109</span>, <span style="color:#ae81ff">250</span>, <span style="color:#ae81ff">55</span>, <span style="color:#ae81ff">215</span>, <span style="color:#ae81ff">75</span>, <span style="color:#ae81ff">173</span>, <span style="color:#ae81ff">188</span>, <span style="color:#ae81ff">226</span>, <span style="color:#ae81ff">250</span>, <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">111</span>, <span style="color:#ae81ff">128</span>, <span style="color:#ae81ff">117</span>, <span style="color:#ae81ff">42</span>&gt;&gt;]]
+</span></span></code></pre></div><p>That&rsquo;s difficult to work with. I&rsquo;d rather have the string representation, so
+that I can drop it in a query parameter or filename without encoding, and so
+I can just copy/paste it around.</p>
+<p>There&rsquo;s a relatively simple workaround. Postgrex has a framework for
+extensions. You can create and install an extension for UUIDs and it will
+override the default one. So open up the <a href="https://github.com/elixir-ecto/postgrex">Postgrex repo</a> and find
+<a href="https://github.com/elixir-ecto/postgrex/blob/master/lib/postgrex/extensions/uuid.ex">uuid.ex</a>. Copy that into your own repo and edit it. Give it a new name, like
+<code>MyDatabase.UUID</code>. In the <code>encode</code> function change this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>[&lt;&lt;<span style="color:#ae81ff">16</span><span style="color:#f92672">::</span>int32()&gt;&gt; <span style="color:#f92672">|</span> <span style="color:#a6e22e">UUID</span><span style="color:#f92672">.</span>string_to_binary!(uuid)]
+</span></span></code></pre></div><p>To this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>[&lt;&lt;<span style="color:#ae81ff">16</span><span style="color:#f92672">::</span>int32()&gt;&gt; <span style="color:#f92672">|</span> uuid]
+</span></span></code></pre></div><p>Then in <code>decode</code>, change this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>&lt;&lt;<span style="color:#ae81ff">16</span><span style="color:#f92672">::</span>int32(), uuid<span style="color:#f92672">::</span>binary<span style="color:#f92672">-</span><span style="color:#ae81ff">16</span>&gt;&gt; <span style="color:#f92672">-&gt;</span> uuid
+</span></span></code></pre></div><p>To this:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>&lt;&lt;<span style="color:#ae81ff">16</span><span style="color:#f92672">::</span>int32(), uuid<span style="color:#f92672">::</span>binary<span style="color:#f92672">-</span><span style="color:#ae81ff">16</span>&gt;&gt; <span style="color:#f92672">-&gt;</span> <span style="color:#a6e22e">UUID</span><span style="color:#f92672">.</span>binary_to_string!(uuid)
+</span></span></code></pre></div><p>Then make a new <code>.ex</code> file and put this one line inside:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span><span style="color:#a6e22e">Postgrex.Types</span><span style="color:#f92672">.</span>define(<span style="color:#a6e22e">MyDatabase.Types</span>, [<span style="color:#a6e22e">MyDatabase.UUID</span>])
+</span></span></code></pre></div><p>Now if we use this new types module when connecting to the database, our UUIDs
+come back as nicely encoded strings.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-elixir" data-lang="elixir"><span style="display:flex;"><span>iex<span style="color:#f92672">&gt;</span> {<span style="color:#e6db74">:ok</span>, conn} <span style="color:#f92672">=</span> <span style="color:#a6e22e">Postgrex</span><span style="color:#f92672">.</span>start_link(<span style="color:#e6db74">hostname</span>: hostname, <span style="color:#e6db74">username</span>: username, <span style="color:#e6db74">password</span>: password, <span style="color:#e6db74">database</span>: database, <span style="color:#e6db74">types</span>: <span style="color:#a6e22e">MyDatabase.Types</span>)
+</span></span><span style="display:flex;"><span>iex<span style="color:#f92672">&gt;</span> <span style="color:#a6e22e">Postgrex</span><span style="color:#f92672">.</span>query!(conn, <span style="color:#e6db74">&#34;SELECT gen_random_uuid()&#34;</span>, [])<span style="color:#f92672">.</span>rows
+</span></span><span style="display:flex;"><span>[[<span style="color:#e6db74">&#34;4aed7120-bc5b-4e78-995c-79eb46aaac47&#34;</span>]]
+</span></span></code></pre></div><p>Note that this requires the <code>uuid</code> dependency to be installed in <code>mix.exs</code>.</p>
+<ul class="pa0">
+  
+</ul>
+<div class="mt6 instapaper_ignoref">
+      
+      
+      </div>
+    </div>
+
+    <aside class="w-30-l mt6-l">
+
+
+
+
+</aside>
+
+  </article>
+
+    </main>
+    <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
+  <div class="flex justify-between">
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://localhost:1313/" >
+    &copy;  Preston's Blog 2024 
+  </a>
+    <div>
+<div class="ananke-socials">
+  
+</div>
+</div>
+  </div>
+</footer>
+
+  </body>
+</html>
