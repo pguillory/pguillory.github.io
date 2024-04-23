@@ -13,7 +13,10 @@ abstraction and write raw SQL.
 Postgrex returns UUID values as a 16-byte binary.
 
 ```elixir
-iex> {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database)
+iex> {:ok, conn} = Postgrex.start_link(hostname: hostname,
+                                       username: username,
+                                       password: password,
+                                       database: database)
 iex> Postgrex.query!(conn, "SELECT gen_random_uuid()", []).rows
 [[<<83, 100, 109, 250, 55, 215, 75, 173, 188, 226, 250, 2, 111, 128, 117, 42>>]]
 ```
@@ -29,12 +32,12 @@ override the default one. So open up the [Postgrex repo] and find
 `MyDatabase.UUID`. In the `encode` function change this:
 
 ```elixir
-[<<16::int32()>> | UUID.string_to_binary!(uuid)]
+[<<16::int32()>> | uuid]
 ```
 
 To this:
 ```elixir
-[<<16::int32()>> | uuid]
+[<<16::int32()>> | UUID.string_to_binary!(uuid)]
 ```
 
 Then in `decode`, change this:
@@ -59,7 +62,11 @@ Now if we use this new types module when connecting to the database, our UUIDs
 come back as nicely encoded strings.
 
 ```elixir
-iex> {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database, types: MyDatabase.Types)
+iex> {:ok, conn} = Postgrex.start_link(hostname: hostname,
+                                       username: username,
+                                       password: password,
+                                       database: database,
+                                       types: MyDatabase.Types)
 iex> Postgrex.query!(conn, "SELECT gen_random_uuid()", []).rows
 [["4aed7120-bc5b-4e78-995c-79eb46aaac47"]]
 ```
