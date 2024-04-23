@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     
@@ -36,10 +36,10 @@
     
 
     
-      <link rel="canonical" href="http://localhost:1313/posts/">
+      <link rel="canonical" href="https://pguillory.github.io/posts/">
     
 
-    <meta property="og:url" content="http://localhost:1313/posts/">
+    <meta property="og:url" content="https://pguillory.github.io/posts/">
   <meta property="og:site_name" content="Preston&#39;s Blog">
   <meta property="og:title" content="Posts">
   <meta property="og:locale" content="en-us">
@@ -94,12 +94,32 @@
     <section class="cf ph3 ph5-l pv3 pv4-l f4 tc-l center measure-wide lh-copy mid-gray"></section>
     <section class="flex-ns flex-wrap justify-around mt5">
       
+        <div class="relative w-100 w-30-l mb4 bg-white">
+          <div class="relative w-100 mb4 bg-white nested-copy-line-height">
+  <div class="bg-white mb3 pa4 gray overflow-hidden">
+    <span class="f6 db">Posts</span>
+    <h1 class="f3 near-black">
+      <a href="/posts/postgrex-custom-types/" class="link black dim">
+        Postgrex Custom Types
+      </a>
+    </h1>
+    <div class="nested-links f5 lh-copy nested-copy-line-height">
+      Making UUIDs easier to work with in Postgrex using custom types I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
+Postgrex returns UUID values as a 16-byte binary.
+iex&gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&gt; Postgrex.
+    </div>
+    <a href="/posts/postgrex-custom-types/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
+  </div>
+</div>
+
+        </div>
+      
     </section></article>
 
     </main>
     <footer class="bg-black bottom-0 w-100 pa3" role="contentinfo">
   <div class="flex justify-between">
-  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="http://localhost:1313/" >
+  <a class="f4 fw4 hover-white no-underline white-70 dn dib-ns pv2 ph3" href="https://pguillory.github.io/" >
     &copy;  Preston's Blog 2024 
   </a>
     <div>
