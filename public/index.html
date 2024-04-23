@@ -132,7 +132,7 @@
         <div class="f6 f5-l lh-copy nested-copy-line-height nested-links">
           Making UUIDs easier to work with in Postgrex using custom types I&rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.
 Postgrex returns UUID values as a 16-byte binary.
-iex&gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&gt; Postgrex.
+iex&gt; {:ok, conn} = Postgrex.start_link() iex&gt; Postgrex.
         </div>
           <a href="/posts/postgrex-custom-types/" class="ba b--moon-gray bg-light-gray br2 color-inherit dib f7 hover-bg-moon-gray link mt2 ph2 pv1">read more</a>
         

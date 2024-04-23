@@ -13,10 +13,7 @@ abstraction and write raw SQL.
 Postgrex returns UUID values as a 16-byte binary.
 
 ```elixir
-iex> {:ok, conn} = Postgrex.start_link(hostname: hostname,
-                                       username: username,
-                                       password: password,
-                                       database: database)
+iex> {:ok, conn} = Postgrex.start_link()
 iex> Postgrex.query!(conn, "SELECT gen_random_uuid()", []).rows
 [[<<83, 100, 109, 250, 55, 215, 75, 173, 188, 226, 250, 2, 111, 128, 117, 42>>]]
 ```
@@ -28,8 +25,8 @@ I can just copy/paste it around.
 There's a relatively simple workaround. Postgrex has a framework for
 extensions. You can create and install an extension for UUIDs and it will
 override the default one. So open up the [Postgrex repo] and find
-[uuid.ex]. Copy that into your own repo and edit it. Give it a new name, like
-`MyDatabase.UUID`. In the `encode` function change this:
+[uuid.ex]. Copy that into your own repo and edit it. Give the module a new
+name, like `MyDatabase.UUID`. In the `encode` function change this:
 
 ```elixir
 [<<16::int32()>> | uuid]
@@ -58,15 +55,12 @@ Then make a new `.ex` file and put this one line inside:
 Postgrex.Types.define(MyDatabase.Types, [MyDatabase.UUID])
 ```
 
-Now if we use this new types module when connecting to the database, our UUIDs
-come back as nicely encoded strings.
+That generates a new module named `MyDatabase.Types`. Now if we use this new
+types module when connecting to the database, our UUIDs come back as nicely
+encoded strings.
 
 ```elixir
-iex> {:ok, conn} = Postgrex.start_link(hostname: hostname,
-                                       username: username,
-                                       password: password,
-                                       database: database,
-                                       types: MyDatabase.Types)
+iex> {:ok, conn} = Postgrex.start_link(types: MyDatabase.Types)
 iex> Postgrex.query!(conn, "SELECT gen_random_uuid()", []).rows
 [["4aed7120-bc5b-4e78-995c-79eb46aaac47"]]
 ```

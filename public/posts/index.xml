@@ -13,7 +13,7 @@
       <link>https://pguillory.github.io/posts/postgrex-custom-types/</link>
       <pubDate>Tue, 23 Apr 2024 13:31:40 -0700</pubDate>
       <guid>https://pguillory.github.io/posts/postgrex-custom-types/</guid>
-      <description>Making UUIDs easier to work with in Postgrex using custom types I&amp;rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&amp;rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.&#xA;Postgrex returns UUID values as a 16-byte binary.&#xA;iex&amp;gt; {:ok, conn} = Postgrex.start_link(hostname: hostname, username: username, password: password, database: database) iex&amp;gt; Postgrex.</description>
+      <description>Making UUIDs easier to work with in Postgrex using custom types I&amp;rsquo;ve been using PostgreSQL UUID columns in my Elixir application. It uses the Postgrex client library to talk to PostgreSQL. It&amp;rsquo;s more typical to use Ecto (which uses Postgrex under the hood), but I wanted to skip that layer of abstraction and write raw SQL.&#xA;Postgrex returns UUID values as a 16-byte binary.&#xA;iex&amp;gt; {:ok, conn} = Postgrex.start_link() iex&amp;gt; Postgrex.</description>
     </item>
   </channel>
 </rss>
